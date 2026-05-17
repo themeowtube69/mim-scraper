@@ -11,8 +11,6 @@ subprocess.run(["pip", "install", "googlesearch-python", "requests", "-q"])
 # ── CELL 2: Imports & Config ────────────────────────────────────────
 import requests, json, csv, time, os, re
 from googlesearch import search as google_search
-from google.colab import files
-
 GROQ_API_KEY = "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"
 OUTPUT_FILE  = "mim_programs.csv"
 DELAY_SEC    = 5  # between universities (respects Groq free tier)
