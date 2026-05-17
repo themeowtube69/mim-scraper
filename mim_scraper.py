@@ -122,7 +122,12 @@ except Exception as e:
         return ""
 
 def analyze(name, text):
-        prompt = "You are an academic researcher. Today is May 2026.\nAnalyze this website text from " + name + " for their Master in Management (MiM) or MSc Management program for Autumn/Fall 2026.\nText: " + text[:14000] + "\nReturn ONLY raw JSON (no markdown):\n{\"program_name\":\"name or Not Available\",\"status\":\"OPEN or CLOSED or UNCLEAR\",\"deadline\":\"exact date or Not Specified\",\"tuition_fees\":\"amount with currency or Not Specified\",\"scholarships\":\"names or Not Specified\"}"
+        prompt = "You are an academic researcher. Today is May 2026.\n"
+            prompt += "Analyze this website text from " + name + " for their Master in Management (MiM) or MSc Management program for Autumn/Fall 2026.\n"
+            prompt += "Text: " + text[:14000] + "\n"
+            prompt += "Return ONLY raw JSON (no markdown):\n"
+            prompt += '{"program_name":"name or Not Available","status":"OPEN or CLOSED or UNCLEAR","deadline":"exact date or Not Specified","tuition_fees":"amount with currency or Not Specified","scholarships":"names or Not Specified"}'
+        
         try:
                     r = requests.post(
                                     "https://api.groq.com/openai/v1/chat/completions",
