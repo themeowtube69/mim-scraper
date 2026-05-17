@@ -110,62 +110,64 @@ UNIVERSITIES = [
         (100,"University of Groningen","Netherlands","https://www.rug.nl/masters/international-business-and-management/"),
 ]
 def read_page(url):
-        try:
-                    r = requests.get(
-                                    "https://r.jina.ai/" + url,
-                                    headers={"User-Agent": "Mozilla/5.0", "Accept": "text/plain"},
-                                    timeout=35
-                    )
-                    return r.text
-    except Exception as e:
+            try:
+                            r = requests.get(
+                                                "https://r.jina.ai/" + url,
+                                                headers={"User-Agent": "Mozilla/5.0", "Accept": "text/plain"},
+                                                timeout=35
+                            )
+                            return r.text
+except Exception as e:
         print("    Read error: " + str(e), flush=True)
         return ""
 
 def analyze(name, text):
-        prompt = "You are an academic researcher. Today is May 2026.\n"
+            prompt = "You are an academic researcher. Today is May 2026.\n"
             prompt += "Analyze this website text from " + name + " for their Master in Management (MiM) or MSc Management program for Autumn/Fall 2026.\n"
             prompt += "Text: " + text[:14000] + "\n"
             prompt += "Return ONLY raw JSON (no markdown):\n"
             prompt += '{"program_name":"name or Not Available","status":"OPEN or CLOSED or UNCLEAR","deadline":"exact date or Not Specified","tuition_fees":"amount with currency or Not Specified","scholarships":"names or Not Specified"}'
-        
-        try:
+
+    try:
                     r = requests.post(
-                                    "https://api.groq.com/openai/v1/chat/completions",
-                                    headers={"Authorization": "Bearer " + GROQ_API_KEY, "Content-Type": "application/json"},
-                                    json={"model": "llama-3.3-70b-versatile", "messages": [{"role": "user", "content": prompt}], "temperature": 0.1},
-                                    timeout=30
+                                        "https://api.groq.com/openai/v1/chat/completions",
+                                        headers={"Authorization": "Bearer " + GROQ_API_KEY, "Content-Type": "application/json"},
+                                        json={"model": "llama-3.3-70b-versatile", "messages": [{"role": "user", "content": prompt}], "temperature": 0.1},
+                                        timeout=30
                     )
                     data = r.json()
                     if "error" in data:
-                                    raise Exception(str(data["error"]["message"]))
-                                content = data["choices"][0]["message"]["content"].replace("```json","").replace("```","").strip()
-                    return json.loads(content)
-    except Exception as e:
+                                        raise Exception(str(data["error"]["message"]))
+                                    content = data["choices"][0]["message"]["content"].replace("```json","").replace("```","").strip()
+        return json.loads(content)
+except Exception as e:
         print("    Groq error: " + str(e), flush=True)
         return None
+
 def main():
-        print("=== MiM University Scraper Starting ===", flush=True)
-        print("Total universities: " + str(len(UNIVERSITIES)), flush=True)
-        with open(OUTPUT_FILE, "w", newline="", encoding="utf-8") as f:
+            print("=== MiM University Scraper Starting ===", flush=True)
+    print("Total universities: " + str(len(UNIVERSITIES)), flush=True)
+    with open(OUTPUT_FILE, "w", newline="", encoding="utf-8") as f:
                     writer = csv.writer(f)
-                    writer.writerow(["QS Rank","University","Country","Program Name","Status","Autumn 2026 Deadline","Tuition Fees","Scholarships","Application Link"])
-                saved = 0
+        writer.writerow(["QS Rank","University","Country","Program Name","Status","Autumn 2026 Deadline","Tuition Fees","Scholarships","Application Link"])
+
+    saved = 0
     skipped = 0
     for rank, name, country, url in UNIVERSITIES:
-                print("\n[" + str(rank) + "/" + str(len(UNIVERSITIES)) + "] " + name + " (" + country + ")", flush=True)
-                print("  URL: " + url, flush=True)
-                text = read_page(url)
-                if not text or len(text) < 200:
-                                print("  SKIPPED - page unreadable", flush=True)
-                                skipped += 1
-                                continue
-                            print("  Page OK (" + str(len(text)) + " chars). Analyzing...", flush=True)
+                    print("\n[" + str(rank) + "/" + str(len(UNIVERSITIES)) + "] " + name + " (" + country + ")", flush=True)
+        print("  URL: " + url, flush=True)
+        text = read_page(url)
+        if not text or len(text) < 200:
+                            print("  SKIPPED - page unreadable", flush=True)
+                            skipped += 1
+                            continue
+                        print("  Page OK (" + str(len(text)) + " chars). Analyzing...", flush=True)
         result = analyze(name, text)
         if not result:
-                        skipped += 1
-                        time.sleep(4)
-                        continue
-                    status = result.get("status", "UNCLEAR")
+                            skipped += 1
+                            time.sleep(4)
+                            continue
+                        status = result.get("status", "UNCLEAR")
         program = result.get("program_name", "")
         deadline = result.get("deadline", "")
         fees = result.get("tuition_fees", "")
@@ -175,10 +177,10 @@ def main():
         print("  Fees: " + fees, flush=True)
         print("  Scholarships: " + scholarships, flush=True)
         if status != "CLOSED":
-            with open(OUTPUT_FILE, "a", newline="", encoding="utf-8") as f:
-                writer = csv.writer(f)
-                writer.writerow([rank, name, country, program, status, deadline, fees, scholarships, url])
-            print("  >>> SAVED <<<", flush=True)
+                            with open(OUTPUT_FILE, "a", newline="", encoding="utf-8") as f:
+                                                    writer = csv.writer(f)
+                                                    writer.writerow([rank, name, country, program, status, deadline, fees, scholarships, url])
+                                                print("  >>> SAVED <<<", flush=True)
             saved += 1
 else:
             print("  CLOSED - not saved", flush=True)
