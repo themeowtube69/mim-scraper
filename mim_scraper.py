@@ -140,7 +140,7 @@ def analyze(name, text):
                                     raise Exception(str(data["error"]["message"]))
                                 content = data["choices"][0]["message"]["content"].replace("```json","").replace("```","").strip()
                     return json.loads(content)
-except Exception as e:
+    except Exception as e:
         print("    Groq error: " + str(e), flush=True)
         return None
 def main():
