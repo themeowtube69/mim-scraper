@@ -117,7 +117,7 @@ def read_page(url):
                                     timeout=35
                     )
                     return r.text
-except Exception as e:
+    except Exception as e:
         print("    Read error: " + str(e), flush=True)
         return ""
 
