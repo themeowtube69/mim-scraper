@@ -1,0 +1,22 @@
+import requests, json, csv, time, os
+GROQ_API_KEY = os.environ.get("GROQ_API_KEY","")
+OUTPUT_FILE = "mim_programs.csv"
+UNIVERSITIES = [
+(2,"Imperial College London","UK","https://www.imperial.ac.uk/business-school/masters/management/"),
+(39,"London School of Economics","UK","https://www.lse.ac.uk/management/study/msc-management"),
+(45,"Warwick Business School","UK","https://warwick.ac.uk/study/postgraduate/courses/mscmanagement/"),
+(61,"HEC Paris","France","https://www.hec.edu/en/master-s-programs/grande-ecole-program-master-in-management"),
+(62,"ESCP Business School","France","https://escp.eu/programmes/master-in-management"),
+(64,"IE Business School","Spain","https://www.ie.edu/business-school/master-programs/master-in-management/"),
+(66,"Bocconi University","Italy","https://www.unibocconi.eu/wps/wcm/connect/bocconi/sitopubblico_en/navigation+tree/home/programs/master+of+science/management"),
+(92,"Duke Fuqua MiM","USA","https://www.fuqua.duke.edu/programs/masters/management-mim"),
+]
+def read_page(url):
+    try:
+            r=requests.get("https://r.jina.ai/"+url,headers={"User-Agent":"Mozilla/5.0"},timeout=35)
+                    return r.text
+                        except Exception as e:
+                                print("Error:"+str(e),flush=True)
+                                        return ""
+                                        def analyze(name,text):
+                                        
